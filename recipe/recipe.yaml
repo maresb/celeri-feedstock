@@ -16,14 +16,31 @@ build:
   noarch: python
   script: ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   python:
+    # Keep this list in sync with [project.scripts] in celeri's pyproject.toml.
     entry_points:
+      - celeri-apply-mesh-params = celeri.scripts.apply_mesh_params:main
+      - celeri-check-fix-segments = celeri.scripts.celeri_check_fix_segments:main
+      - celeri-create-bel-mesh = celeri.scripts.create_bel_mesh:main
       - celeri-create-grid-station = celeri.scripts.create_grid_station:main
+      - celeri-create-mesh-params-template = celeri.scripts.create_mesh_params_template:main
       - celeri-forward = celeri.scripts.celeri_forward:main
       - celeri-msh2stl = celeri.scripts.msh2stl:main
+      - celeri-remove-vels-segment-collocated = celeri.scripts.celeri_remove_vels_segment_collocated:main
+      - celeri-report-segment-priors = celeri.scripts.celeri_report_segment_priors:main
       - celeri-segmesh = celeri.scripts.segmesh:main
       - celeri-snap-segments = celeri.scripts.snap_segments:main
       - celeri-solve = celeri.scripts.celeri_solve:main
       - celeri-stl2msh = celeri.scripts.stl2msh:main
+      # The following two entry points are broken upstream in celeri 0.0.5 and are
+      # therefore not exercised in the tests below. pip generates them regardless,
+      # so they are listed here only to mirror pyproject.toml. Remove the comment
+      # once https://github.com/brendanjmeade/celeri is fixed.
+      #   - celeri-check-segment-block-integrity: target module has no `main` and
+      #     executes top-level code (build_model on a hard-coded path) at import.
+      #   - celeri-reweight-stations: points at module `celeri-reweight-stations`
+      #     (hyphens, not importable); the real file is celeri_reweight_stations.py.
+      - celeri-check-segment-block-integrity = celeri.scripts.celeri_check_segment_block_integrity:main
+      - celeri-reweight-stations = celeri.scripts.celeri-reweight-stations:main
 
 requirements:
   host:
@@ -102,6 +119,13 @@ tests:
       - celeri-stl2msh --help
       - celeri-forward --help
       - celeri-create-grid-station --help
+      - celeri-apply-mesh-params --help
+      - celeri-check-fix-segments --help
+      - celeri-create-bel-mesh --help
+      - celeri-create-mesh-params-template --help
+      - celeri-report-segment-priors --help
+      # celeri-remove-vels-segment-collocated has a working entry point but parses
+      # sys.argv manually and exits 1 on --help, so it is not tested here.
       - python -c "from importlib.metadata import version; v = version('celeri'); print(v); assert v == '${{ version }}'"
 
 about:
